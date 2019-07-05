@@ -31,7 +31,40 @@ var acceptInput = false;
 var texters=document.querySelector("#texters")
 var inputt=document.querySelector("#inputt")
 var codeword="ninja";
-var codewords=["HULK","XMEN","IRONMAN","DOCTOR STRANGE","THOR","DEADPOOL","THANOS","CAPITAIN MARVEL","HAWKEYE"];
+var levels= {
+		levelC:0,
+		levelData:[
+			{ words:["HULK","MAGNETO","IRONMAN","DOCTOR STRANGE"], timePerLetter:4.0 },
+			{ words:["THOR","DEADPOOL","THANOS","CAPITAIN MARVEL","HAWKEYE"], timePerLetter:3.5 },
+			{ words:["BLACK PANTHER","BLACK WIDOW","PUNISHER","LOKI","VISION","NICK FURY"], timePerLetter:3 },
+			{ words:["CAPITAIN AMERICA","JESSICA JONES","SPIDERMAN","MYSTERIO","IRON PATRIOT","IRON FIST"], timePerLetter:2.5 },
+			{ words:["ULTRON","YELLOWJACKET","BLACK DWARF","GHOST","DORMAMMU","RED SKULL","CULL OBSIDIAN"], timePerLetter:2  },
+			{ words:["JUSTIN HAMMER","CORVUS GLAIVE","WHIPLASH","ULYSSES KLAUE","EGO","AYESHA","VULTURE","KILLMONGER"], timePerLetter:1.0 }
+		],
+		wordBucket :[],
+		// return true if word not in wordBucket
+		checkWordBucket:function (word){
+			// check if new word has already been typed 
+			for (var i=0;i<this.wordBucket.length;i++) {
+				if (this.wordBucket[i] == word ){
+					return false;
+				}
+			}
+			return true;
+		},
+		addToWordBucket: function(word){
+			this.wordBucket.push(word);
+		}
+		clearWordBucket: function(word){
+			this.wordBucket = [];
+		},
+		checkForEndOfLevel:function(){
+			if (this.wordBucket.length == this.levelData[this.levelC].words.length){
+				return true;
+			}
+			return false;
+		}
+}
 var score=100;
 
 // when page loads call this
@@ -54,10 +87,15 @@ function buttonClick(){
 	gameover.hidden = true;
 	document.querySelector("#input-area").hidden=false;
 	if (document.querySelector("#button-text").innerHTML == "CONTINUE"){
+		if(levels.checkForEndOfLevel()){
+			levels.levelC++;
+			levels.clearWordBucket();
+		}
 		codeword=getcode();
 	}
 	if (document.querySelector("#button-text").innerHTML == "START"){
 		score=0;
+		levels.levelC=0;
 		updateScore();
 		codeword=getcode();
 		hearts=3;
@@ -152,13 +190,18 @@ function tick(){
 var  bananacount=0; //bananacount is the number of letters the user has typed
 
 function getcode(){
-  var worders=codewords[ Math.floor(Math.random()*codewords.length)];
-  document.querySelector("#untyped-letters").innerHTML=worders;
+  var word = levels.levelData[levels.levelC].words[ Math.floor(Math.random()*levels.levelData[levels.levelC].words.length)];
+  while(!levels.checkWordBucket(word)) {
+	  word = levels.levelData[levels.levelC].words[ Math.floor(Math.random()*levels.levelData[levels.levelC].words.length)];
+  }
+  levels.addToWordBucket(word);
+
+  document.querySelector("#untyped-letters").innerHTML=word;
   document.querySelector("#typed-letters").innerHTML="";
   bananacount=0;
-  countdown = worders.length * TPL;
+  countdown = word.length * TPL;
   inputt.innerHTML="";
-  return worders;
+  return word;
 }
 
 function checkkey(key){
