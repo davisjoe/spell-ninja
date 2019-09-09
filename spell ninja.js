@@ -45,6 +45,7 @@ var levels= {
 		// return true if word not in wordBucket
 		checkWordBucket:function (word){
 			// check if new word has already been typed 
+			console.log("word " + word)
 			for (var i=0;i<this.wordBucket.length;i++) {
 				if (this.wordBucket[i] == word ){
 					return false;
@@ -54,11 +55,13 @@ var levels= {
 		},
 		addToWordBucket: function(word){
 			this.wordBucket.push(word);
-		}
+		},
 		clearWordBucket: function(word){
 			this.wordBucket = [];
 		},
 		checkForEndOfLevel:function(){
+			console.log("levelC " + this.levelC);
+			
 			if (this.wordBucket.length == this.levelData[this.levelC].words.length){
 				return true;
 			}
@@ -66,6 +69,7 @@ var levels= {
 		}
 }
 var score=100;
+console.log("we got here")
 
 // when page loads call this
 function loaded(){
@@ -191,10 +195,18 @@ var  bananacount=0; //bananacount is the number of letters the user has typed
 
 function getcode(){
   var word = levels.levelData[levels.levelC].words[ Math.floor(Math.random()*levels.levelData[levels.levelC].words.length)];
-  while(!levels.checkWordBucket(word)) {
-	  word = levels.levelData[levels.levelC].words[ Math.floor(Math.random()*levels.levelData[levels.levelC].words.length)];
+  if (levels.checkForEndOfLevel()){
+	  document.querySelector("#button").hidden = false;
+	  document.querySelector("#button-text").innerHTML = "CONTINUE";
+	  acceptInput = false;
+	  moving = "dead";
+	  console.log("new level?")
+  } else {
+	  while( !levels.checkWordBucket(word) ) {
+		  word = levels.levelData[levels.levelC].words[ Math.floor(Math.random()*levels.levelData[levels.levelC].words.length)];
+	  }
+	  levels.addToWordBucket(word);
   }
-  levels.addToWordBucket(word);
 
   document.querySelector("#untyped-letters").innerHTML=word;
   document.querySelector("#typed-letters").innerHTML="";
